@@ -1,0 +1,29 @@
+# set path
+setwd('G:/3rd year/ST/ST 3082/project/3. project2')
+
+train = read.csv('timevariableadded_removedoutlier.csv')
+#test = read.csv("testdataforproject2ndfile.csv")
+
+head(train)
+
+library(MASS)
+null <- lm(AveragePrice~1, data = train)
+full <- lm(AveragePrice~., data = train)
+
+# forward stepwise 
+step_model=stepAIC(null, scope=list(lower=null, upper=full), data=train, trace = TRUE, 
+                   direction = 'both')
+formula(step_model)
+summary(step_model)
+
+# forward selection
+for_model=stepAIC(null, scope=list(lower=null, upper=full),data=train, trace = TRUE, 
+                  direction = 'forward')
+summary(for_model)
+formula(for_model)
+
+# backward elimination 
+back_model=stepAIC(full, scope=list(lower=null, upper=full),data=train, trace = TRUE, 
+                   direction='backward')
+summary(back_model)
+formula(back_model)

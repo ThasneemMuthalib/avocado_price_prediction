@@ -1,0 +1,155 @@
+########################ridge###########################################
+library(dplyr)
+
+setwd('G:/3rd year/ST/ST 3082/project/3. project2')
+
+train = read.csv('timevariableadded_removedoutlier.csv')
+#train = train %>% dplyr::select(-"log.Total_Bags")
+#train = train %>% dplyr::select(-"Date_Ex")
+
+test.data = read.csv("testdataforproject2ndfile.csv")
+
+library(glmnet)
+x_train <- model.matrix(AveragePrice ~ ., train)[, -1]
+y_train <- train$AveragePrice
+
+x_test <- model.matrix(AveragePrice ~ ., test.data)[, -1]
+y_test <- test.data$AveragePrice
+
+ncol(x_test)
+ncol(x_train)
+
+lambdas <- 10^seq(2, -3, by = -.1)
+ridge_reg = glmnet(x_train, y_train, nlambda = 25, alpha = 0, family = 'gaussian', lambda = lambdas)
+
+summary(ridge_reg)
+
+cv_ridge <- cv.glmnet(x_train, y_train, alpha = 0, lambda = lambdas)
+optimal_lambda <- cv_ridge$lambda.min
+optimal_lambda
+
+# Coefficients for ridge regression model as lambda grows 
+plot(ridge_reg, xvar = "lambda")
+
+# 10-fold CV MSE for a ridge model 
+plot(cv_ridge, main = "Ridge penalty\n\n")
+
+# get results
+eval_results <- function(true, predicted, df) {
+  SSE <- sum((predicted - true)^2)
+  SST <- sum((true - mean(true))^2)
+  R_square <- 1 - SSE / SST
+  RMSE = sqrt(SSE/nrow(df))
+  
+  # Model performance metrics
+  data.frame(
+    RMSE = RMSE,
+    Rsquare = R_square
+  )
+}
+
+#coef(ridge_reg)
+
+# Prediction and evaluation on train data
+predictions_train <- predict(ridge_reg, s = optimal_lambda, newx = x_train)
+eval_results(y_train, predictions_train, train)
+
+# mean squared error ridge - training
+mean((y_train-predictions_train)**2)
+
+# Prediction and evaluation on test data
+predictions_test <- predict(ridge_reg, s = optimal_lambda, newx = x_test)
+eval_results(y_test, predictions_test, test.data)
+
+# mean squared error ridge - testing
+mean((y_test-predictions_test)**2)
+
+# mean absolute error percentage
+mean(abs(y_test-predictions_test)/y_test)*100
+
+ridge_reg_model <- glmnet(x_train, y_train, alpha = 0, lambda = optimal_lambda)
+coef(ridge_reg_model)
+
+##################################LASSO########################################
+
+lambdas <- 10^seq(2, -3, by = -.1)
+lasso_reg = glmnet(x_train, y_train, nlambda = 25, alpha = 1, family = 'gaussian', lambda = lambdas)
+
+summary(lasso_reg)
+
+cv_lasso <- cv.glmnet(x_train, y_train, alpha = 1, lambda = lambdas)
+optimal_lambda <- cv_lasso$lambda.min
+optimal_lambda
+
+# Coefficients for Lasso regression model as lambda grows
+plot(lasso_reg, xvar = "lambda")
+
+# 10-fold CV MSE for a Lasso model
+plot(cv_lasso, main = "Lasso penalty\n\n")
+
+# Prediction and evaluation on train data
+predictions_train <- predict(lasso_reg, s = optimal_lambda, newx = x_train)
+eval_results(y_train, predictions_train, train)
+
+# mean squared error lasso - train
+mean((y_train-predictions_train)**2)
+
+# Prediction and evaluation on test data
+predictions_test <- predict(lasso_reg, s = optimal_lambda, newx = x_test)
+eval_results(y_test, predictions_test, test.data)
+
+# mean squared error lasso - test
+mean((y_test-predictions_test)**2)
+
+# mean absolute error percentage
+mean(abs(y_test-predictions_test)/y_test)*100
+
+lasso_reg_model <- glmnet(x_train, y_train, alpha = 1, lambda = optimal_lambda)
+coef(lasso_reg_model)
+
+#################################ELASTIC NET###############################3###
+
+library(caret)
+library(ggplot2)
+library(dplyr)# To get train function
+
+#grid search across 
+cv_glmnet <- train(
+  x = x_train,
+  y = y_train,
+  method = "glmnet",
+  preProc = c("zv", "center", "scale"),
+  trControl = trainControl(method = "cv", number = 10),
+  tuneLength = 10
+)
+
+cv_glmnet$bestTune
+
+# results for model with lowest RMSE
+cv_glmnet$results %>%
+  filter(alpha == cv_glmnet$bestTune$alpha, lambda == cv_glmnet$bestTune$lambda)
+
+# plot cross-validated RMSE
+ggplot(cv_glmnet)
+
+# predict avocado price on test data
+pred <- predict(cv_glmnet, x_train)
+
+# root mean squared error elasticnet - training
+eval_results(y_train, pred, x_train)
+
+# mean squared error elasticnet - training
+mean((y_train-pred)**2)
+
+# Evaluating test data
+predtest <- predict(cv_glmnet, x_test)
+eval_results(y_test, predtest, test.data)
+
+# mean squared error elasticnet - test
+mean((y_test-predtest)**2)
+
+# mean absolute percentage error elasticnet
+mean(abs(y_test-predtest)/y_test)*100
+
+elastic_reg_model <- glmnet(x_train, y_train, alpha = 0.2, lambda = 0.0001131516)
+coef(elastic_reg_model)

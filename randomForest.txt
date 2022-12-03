@@ -1,0 +1,177 @@
+# set the path 
+setwd("C://Users//ACER//Desktop//ST3082_Data_Analysis_project1")
+
+# libraries 
+library(MASS)
+library(dplyr)
+library(glmnet)
+
+train = read.csv("dataforproject2ndfile.csv")
+
+#Remove outlying data
+df_new  = data.frame()
+for (i in 1:nrow(train)) {
+  if(train$AveragePrice[i]<2.5){
+    df_new = rbind(df_new,train[i,])
+  }
+}
+
+# save the data free from outliers 
+write.csv(df_new,"timevariableadded_removedoutlier.csv")
+
+library(dplyr)
+train = read.csv("timevariableadded_removedoutlier.csv")
+
+# drop columns
+train = train %>% dplyr::select(-"log.Total_Bags")
+train = train %>% dplyr::select(-"Date_Ex")
+
+test.data = read.csv("testdataforproject2ndfile.csv")
+
+library(glmnet)
+library(randomForest)
+x_train <- model.matrix(AveragePrice ~ ., train)[, -1]
+y_train <- train$AveragePrice
+
+x_test <- model.matrix(AveragePrice ~ ., test.data)[, -1]
+y_test <- test.data$AveragePrice
+
+# names of features
+features <- setdiff(names(train), "AveragePrice")
+
+set.seed(123)
+
+m2 <- tuneRF(
+  x          = train[features],
+  y          = train$AveragePrice,
+  ntreeTry   = 500,
+  mtryStart  = 5,
+  stepFactor = 1.5,
+  improve    = 0.01,
+  trace      = FALSE      # to not show real-time progress 
+)
+
+# hyperparameter grid search
+hyper_grid <- expand.grid(
+  mtry       = seq(20, 30, by = 2),
+  node_size  = seq(3, 9, by = 2),
+  sampe_size = c(.55, .632, .70, .80),
+  OOB_RMSE   = 0
+)
+
+install.packages("ranger")
+library(ranger)
+for(i in 1:nrow(hyper_grid)) {
+  
+  # train model
+  model <- ranger(
+    formula         = AveragePrice ~ ., 
+    data            = train, 
+    num.trees       = 500,
+    mtry            = hyper_grid$mtry[i],
+    min.node.size   = hyper_grid$node_size[i],
+    sample.fraction = hyper_grid$sampe_size[i],
+    seed            = 123
+  )
+  
+  # add OOB error to grid
+  hyper_grid$OOB_RMSE[i] <- sqrt(model$prediction.error)
+}
+
+hyper_grid %>% 
+  dplyr::arrange(OOB_RMSE) %>%
+  head(10)
+library(caret)
+# one-hot encode our categorical variables
+one_hot <- dummyVars(~ ., train, fullRank = FALSE)
+ames_train_hot <- predict(one_hot, train) %>% as.data.frame()
+
+# make ranger compatible names
+names(ames_train_hot) <- make.names(names(ames_train_hot), allow_ = FALSE)
+
+# hyperparameter grid search --> same as above but with increased mtry values
+hyper_grid_2 <- expand.grid(
+  mtry       = seq(1, 14, by = 5),
+  node_size  = seq(3, 9, by = 2),
+  sampe_size = c(.55, .632, .70, .80),
+  OOB_RMSE  = 0
+)
+
+# perform grid search
+for(i in 1:nrow(hyper_grid_2)) {
+  
+  # train model
+  model <- ranger(
+    formula         = AveragePrice~ ., 
+    data            = ames_train_hot, 
+    num.trees       = 500,
+    mtry            = hyper_grid_2$mtry[i],
+    min.node.size   = hyper_grid_2$node_size[i],
+    sample.fraction = hyper_grid_2$sampe_size[i],
+    seed            = 123
+  )
+  
+  # add OOB error to grid
+  hyper_grid_2$OOB_RMSE[i] <- sqrt(model$prediction.error)
+}
+
+hyper_grid_2 %>% 
+  dplyr::arrange(OOB_RMSE) %>%
+  head(10)
+
+OOB_RMSE <- vector(mode = "numeric", length = 100)
+
+for(i in seq_along(OOB_RMSE)) {
+  
+  optimal_ranger <- ranger(
+    formula         = AveragePrice ~ ., 
+    data            = train, 
+    num.trees       = 500,
+    mtry            = 6,
+    min.node.size   = 5,
+    sample.fraction = .8,
+    importance      = 'impurity'
+  )
+  
+  OOB_RMSE[i] <- sqrt(optimal_ranger$prediction.error)
+}
+
+hist(OOB_RMSE, breaks = 20)
+
+install.packages("broom")
+library(broom)
+
+library(tidyverse)
+optimal_ranger$variable.importance %>% 
+  tidy() %>%
+  dplyr::arrange(desc(x)) %>%
+  dplyr::top_n(14) %>%
+  ggplot(aes(reorder(names, x), x)) +
+  geom_col() +
+  coord_flip() +
+  ggtitle("Top 13 important variables")
+
+install.packages("h2o")
+library(h2o)
+Sys.setenv(JAVA_HOME="E:/java/JAVA(1)")
+
+h2o.init()
+h2o.no_progress()
+
+y <- "AveragePrice"
+x <- setdiff(names(train), y)
+
+as.factor(train$type)
+as.factor(train$region)
+x_train = train %>% select(-"AveragePrice")
+x_test = test.data %>% select(-"AveragePrice")
+rfmodel = randomForest(AveragePrice~.,data = train,importance = T,mtry = 7,ntree = 500)
+
+pred = predict(rfmodel,x_train)
+
+y_train <- train$AveragePrice
+mean((y_train-pred)**2)*10
+pred2 = predict(rfmodel,x_test)
+mean((y_test-pred2)**2)
+
+mean(abs(y_test-pred2)/y_test)*100
