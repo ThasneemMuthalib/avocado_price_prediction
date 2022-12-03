@@ -7,3 +7,6 @@ Used softwares: Google colab, R studio, Spyder
 Algorithms and techniques: forward, backward, stepwise selection, pre whitening, Multiple linear regression, Decision tree regressor, Random forest regressor, Ridge, Lasso, Elasticnet regression, RandomizedSearchCV
 
 Languages: Python, R
+
+![image](https://user-images.githubusercontent.com/86557599/205424646-a7815a39-09b1-4bbc-9d78-b9d0e16d3223.png)
+
