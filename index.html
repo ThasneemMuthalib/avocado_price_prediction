@@ -1,0 +1,263 @@
+<html>
+    <style>
+        body {
+          background-image: url('body_bg.jpg');
+        }
+        </style>
+            <style>
+                html, body {
+                min-height: 100%;
+                }
+                h1,h4 {
+                    color: black;
+                }
+                body, div, form, input, select { 
+                padding: 0;
+                margin: 0;
+                outline: none;
+                font-family: Roboto, Arial, sans-serif;
+                font-size: 14px;
+                color: #666;
+                line-height: 22px;
+                }
+                h1, h4 {
+                margin: 15px 0 4px;
+                font-weight: 400;
+                }
+                h4 {
+                margin: 20px 0 4px;
+                font-weight: 400;
+                }
+                span {
+                color: red;
+                }
+                .small {
+                font-size: 10px;
+                line-height: 18px;
+                }
+                .testbox {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: inherit;
+                padding: 3px;
+                }
+                form {
+                width: 100%;
+                padding: 20px;
+                 
+                }
+                input {
+                width: calc(100% - 10px);
+                padding: 5px;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+                vertical-align: middle;
+                }
+                input:hover, textarea:hover, select:hover {
+                outline: none;
+                border: 1px solid #095484;
+                background: #e6eef7;
+                }
+                .title-block select, .title-block input {
+                margin-bottom: 10px;
+                }
+                select {
+                padding: 7px 0;
+                border-radius: 3px;
+                border: 1px solid #ccc;
+                background:white;
+                }
+                select, table {
+                width: 100%;
+                }
+                option {
+                background: #fff;
+                }
+                .day-visited, .time-visited {
+                position: relative;
+                }
+                input[type="date"]::-webkit-inner-spin-button {
+                display: none;
+                }
+                input[type="time"]::-webkit-inner-spin-button {
+                margin: 2px 22px 0 0;
+                }
+                .day-visited i, .time-visited i, input[type="date"]::-webkit-calendar-picker-indicator {
+                position: absolute;
+                top: 8px;
+                font-size: 20px;
+                }
+                .day-visited i, .time-visited i {
+                right: 5px;
+                z-index: 1;
+                color: #a9a9a9;
+                }
+                [type="date"]::-webkit-calendar-picker-indicator {
+                right: 0;
+                z-index: 2;
+                opacity: 0;
+                }
+                .question-answer label {
+                display: block;
+                padding: 0 20px 10px 0;
+                }
+                .question-answer input {
+                width: auto;
+                margin-top: -2px;
+                }
+                th, td {
+                width: 18%;
+                padding: 15px 0;
+                border-bottom: 1px solid #ccc;
+                text-align: center;
+                vertical-align: unset;
+                line-height: 18px;
+                font-weight: 400;
+                word-break: break-all;
+                }
+                .first-col {
+                width: 25%;
+                text-align: left;
+                }
+                textarea {
+                width: calc(100% - 6px);
+                }
+                .btn-block {
+                margin-top: 20px;
+                text-align: center;
+                }
+                button {
+                width: 150px;
+                padding: 10px;
+                border: none;
+                -webkit-border-radius: 5px; 
+                -moz-border-radius: 5px; 
+                border-radius: 5px; 
+                background-color: #095484;
+                font-size: 16px;
+                color: #fff;
+                cursor: pointer;
+                }
+                button:hover {
+                background-color: #0666a3;
+                }
+                @media (min-width: 568px) {
+                .title-block {
+                display: flex;
+                justify-content: space-between;
+                }
+                .title-block select {
+                width: 30%;
+                margin-bottom: 0;
+                }
+                .title-block input {
+                width: 31%;
+                margin-bottom: 0;
+                }
+                th, td {
+                word-break: keep-all;
+                }
+                }
+              </style>
+<body>
+
+    <img src="../static/logo.png" alt="Flowers in Chania">
+
+
+
+<div class="testbox">
+      <form action="{{url_for('predict')}}" method="post">
+        
+        <h4>Type<span>*</span></h4>
+        <select name="type" id="type" >
+          <option value=""></option>
+          <option value=0 style="color:black">Conventional</option>
+														<option value=1 style="color:black" selected>Organic</option>
+        </select>
+        <h4>Region<span>*</span></h4>
+        <select name="region" id="region"  >
+<option value=""></option>
+          <option value=0 style="color:black" >Albany</option>
+												    <option value=1 style="color:black">Atlanta</option>
+														<option value=2 style="color:black">BaltimoreWashington</option>
+														<option value=3 style="color:black">Boise</option>
+														<option value=4 style="color:black">Boston</option>
+														<option value=5 style="color:black">BuffaloRochester</option>
+														<option value=6 style="color:black">California</option>                               
+														<option value=7 style="color:black">Charlotte</option>
+														<option value=8 style="color:black">Chicago</option>
+														<option value=9 style="color:black">CincinnatiDayton</option>
+														<option value=10 style="color:black">Columbus</option>
+														<option value=11 style="color:black">DallasFtWorth</option>
+														<option value=12 style="color:black">Denver</option>
+														<option value=13 style="color:black">Detroit</option>
+														<option value=14 style="color:black">GrandRapids</option>
+														<option value=15 style="color:black">GreatLakes</option>
+														<option value=16 style="color:black">HarrisburgScranton</option>
+														<option value=17 style="color:black" selected>HartfordSpringfield</option>
+														<option value=18 style="color:black">Houston</option>
+														<option value=19 style="color:black">Indianapolis</option>
+														<option value=20 style="color:black">Jacksonville</option>
+														<option value=21 style="color:black">LasVegas</option>
+														<option value=22 style="color:black">LosAngeles</option>
+														<option value=23 style="color:black">Louisville</option>
+														<option value=24 style="color:black">MiamiFtLauderdation>
+														<option value=28 style="color:black">NewYork</option>
+														<option value=29 style="color:black">Northeast</option>
+														<option value=30 style="color:black">NorthernNewEngland</option>
+														<option value=31 style="color:black">Orlando</option>
+														<option value=32 style="color:black">Philadelphia</option>
+														<option value=33 style="color:black">PhoenixTucson</option>
+														<option value=34 style="color:black">Pittsburgh</option>
+														<option value=35 style="color:black">Plains</option>
+														<option value=36 style="color:black">Portland</option>
+														<option value=37 style="color:black">RaleighGreensboro</option>
+														<option value=38 style="color:black">RichmondNorfolk</option>
+														<option value=39 style="color:black">Roanoke</option>
+														<option value=40 style="color:black">Sacramento</option>
+														<option value=41 style="color:black">SanDiego</option>
+														<option value=42 style="color:black">SanFrancisco</option>
+														<option value=43 style="color:black">Seattle</option>
+														<option value=44 style="color:black">SouthCarolina</option>
+														<option value=45 style="color:black">SouthCentral</option>
+														<option value=46 style="color:black">Southeast</option>
+														<option value=47 style="color:black">Spokane</option>
+														<option value=48 style="color:black">StLouis</option>
+														<option value=49 style="color:black">Syracuse</option>
+														<option value=50 style="color:black">Tampa</option>
+														<option value=51 style="color:black" >West</option>
+														<option value=52 style="color:black">WestTexNewMexico</option> 
+        </select>
+        <h4>Variety<span>*</span></h4>
+        <div class="title-block">
+          <input class="name" type="text" name="x4770" placeholder="4770" required/>
+          <input class="name" type="text" name="x4046" placeholder="4046" required/>
+          <input class="name" type="text" name="x4225" placeholder="4225" required/>
+        </div>
+
+        <h4>Date Information (starting from 30th july 2017: date index - 130)<span>*</span></h4>
+        <div class="title-block">
+          <input class="" type="text" name="date_new" placeholder="Date Index" required/>
+          <input class="name" type="text" name="month_ex" placeholder="Month" required/>
+          <input class="name" type="text" name="year" placeholder="Year" required/>
+        </div>
+        
+        <h4>Total Volume<span>*</span></h4>
+        <input type="text" name="total_volume" required/>
+        <h4>Small Bags<span>*</span></h4>
+        <input type="text" name="small_bags" required/>
+        <h4>Large Bags<span>*</span></h4>
+        <input type="text"  name="large_bags" required/>
+        <h4>Extra Large Bags<span>*</span></h4>
+        <input type="text" name="xlarge_bags" required/>
+        <div class="btn-block">
+          <button type="submit" href="/">Predict</button>
+<button type="reset">Reset</button>
+        </div>
+      </form>
+      
+    </div>
+    <center><h2>{{prediction_text}}</h2></center>
+  </body>
+</html>
