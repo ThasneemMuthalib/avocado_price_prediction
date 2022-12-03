@@ -4,7 +4,7 @@ The price of an Avocado is a vital factor for farmers, sellers also for customer
 
 Used softwares: Google colab, R studio, Spyder
 
-Algorithms and techniques: forward, backward, stepwise selection, pre whitening, Multiple linear regression, Decision tree regressor, Random forest regressor, Ridge, Lasso, Elasticnet regression, RandomizedSearchCV
+Algorithms and techniques: forward, backward, stepwise selection, pre whitening, Multiple linear regression, Decision tree regressor, Random forest regressor, Feature importance plot, Ridge, Lasso, Elasticnet regression, RandomizedSearchCV, matplotlib, sklearn, label encoding
 
 Languages: Python, R
 
